@@ -1,0 +1,158 @@
+# RIFLE — API de Gestión de Ventas
+
+Backend REST API para la gestión de ventas, catálogo y usuarios de la tienda de ropa **RIFLE**. Construido con **FastAPI**, **SQLAlchemy** y autenticación **JWT**.
+
+---
+
+## Tabla de contenidos
+
+- [Características](#características)
+- [Tecnologías](#tecnologías)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Instalación y configuración](#instalación-y-configuración)
+- [Variables de entorno](#variables-de-entorno)
+- [Ejecución](#ejecución)
+- [Endpoints principales](#endpoints-principales)
+- [Autenticación](#autenticación)
+
+---
+
+## Características
+
+- Autenticación segura con JWT (JSON Web Tokens)
+- Gestión de usuarios y asesores
+- Catálogo de productos y locales
+- Registro y consulta de ventas
+- Documentación automática con Swagger UI (`/docs`)
+- Base de datos SQLite lista para desarrollo
+
+---
+
+## Tecnologías
+
+| Tecnología | Uso |
+|---|---|
+| [FastAPI](https://fastapi.tiangolo.com/) | Framework principal |
+| [SQLAlchemy](https://www.sqlalchemy.org/) | ORM y manejo de base de datos |
+| [Pydantic](https://docs.pydantic.dev/) | Validación de datos y configuración |
+| [python-jose](https://python-jose.readthedocs.io/) | Generación y verificación de JWT |
+| [passlib + bcrypt](https://passlib.readthedocs.io/) | Hash seguro de contraseñas |
+| SQLite | Base de datos (desarrollo) |
+
+---
+
+## Estructura del proyecto
+
+```
+app/
+├── __init__.py
+├── main.py              # Punto de entrada, configuración de la app y middlewares
+├── config.py            # Variables de configuración (SECRET_KEY, DB, etc.)
+├── auth.py              # Lógica de JWT: creación, verificación y hash de contraseñas
+├── database.py          # Conexión a la base de datos y sesión SQLAlchemy
+├── dependencies.py      # Dependencias reutilizables (usuario autenticado actual)
+├── models/              # Modelos de base de datos (User, Advisor, Local, Product, Sale)
+└── routers/             # Rutas agrupadas por módulo (auth, users, catalog, sales)
+```
+
+---
+
+## Instalación y configuración
+
+### 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/Jamora1896/final_uribe_26_back.git
+cd rifle-api
+```
+
+### 2. Crear entorno virtual
+
+```bash
+python -m venv venv
+source venv/bin/activate        # Linux / macOS
+venv\Scripts\activate           # Windows
+```
+
+### 3. Instalar dependencias
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## Variables de entorno
+
+Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
+
+```env
+SECRET_KEY=tu_clave_secreta_aqui
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=60
+DATABASE_URL=sqlite:///./rifle.db
+```
+
+> Si no se proporciona el archivo `.env`, se usarán los valores por defecto definidos en `config.py`. **No uses los valores por defecto en producción.**
+
+---
+
+##  Ejecución
+
+```bash
+uvicorn app.main:app --reload
+```
+
+La API estará disponible en: [http://localhost:8000](http://localhost:8000)
+
+Documentación interactiva: [http://localhost:8000/docs](http://localhost:8000/docs)
+
+---
+
+## Endpoints principales
+
+### Auth
+| Método | Ruta | Descripción |
+|---|---|---|
+| `POST` | `/auth/login` | Iniciar sesión y obtener token JWT |
+
+### Usuarios
+| Método | Ruta | Descripción |
+|---|---|---|
+| `GET` | `/users/` | Listar usuarios |
+| `POST` | `/users/` | Crear usuario |
+| `GET` | `/users/{id}` | Obtener usuario por ID |
+
+### Catálogo
+| Método | Ruta | Descripción |
+|---|---|---|
+| `GET` | `/catalog/products` | Listar productos |
+| `POST` | `/catalog/products` | Crear producto |
+| `GET` | `/catalog/locals` | Listar locales |
+
+### Ventas
+| Método | Ruta | Descripción |
+|---|---|---|
+| `GET` | `/sales/` | Listar ventas |
+| `POST` | `/sales/` | Registrar venta |
+
+> La lista completa de endpoints con parámetros y esquemas está disponible en `/docs`.
+
+---
+
+## Autenticación
+
+La API usa **Bearer Token** (JWT). Para acceder a los endpoints protegidos:
+
+1. Haz `POST /auth/login` con tus credenciales
+2. Copia el `access_token` de la respuesta
+3. Incluye el token en el header de cada petición:
+
+```http
+Authorization: Bearer <tu_token_aqui>
+```
+
+El token expira en **60 minutos** por defecto (configurable con `ACCESS_TOKEN_EXPIRE_MINUTES`).
+
+---
+
